@@ -58,7 +58,7 @@ task createIntelliJRuns {
         file.createNewFile()
     }
     file.setText("<component name=\"ProjectRunConfigurationManager\">\n" +
-            "    <configuration default=\"false\" name=\"Launch RB\" type=\"GradleRunConfiguration\" factoryName=\"Gradle\">\n" +
+            "    <configuration default=\"false\" name=\"Launch RB\" type=\"GradleRunConfiguration\" factoryName=\"Gradle\" singleton=\"true\">\n" +
             "        <ExternalSystemSettings>\n" +
             "            <option name=\"executionName\" />\n" +
             "            <option name=\"externalProjectPath\" value=\"\$PROJECT_DIR\$\" />\n" +
