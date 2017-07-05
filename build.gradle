@@ -7,6 +7,7 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
 apply plugin: 'application'
+apply from: "https://github.com/superaxander/gradle-hot-swap/raw/master/hot-swap.gradle"
 
 sourceCompatibility = targetCompatibility = 1.8
 
@@ -39,6 +40,8 @@ run {
     dependsOn(compileJava)
     args = ["--unpackedModsDir", "./build/classes/main", "--tempDir", "./build/temp"]
 }
+
+
 
 // You should not use these tasks! Distribution of the game jar is not allowed!
 assembleDist.setEnabled(false)
