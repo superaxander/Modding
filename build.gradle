@@ -6,9 +6,9 @@ version '1.0.0'
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
+apply plugin: 'application'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -29,65 +29,58 @@ task processSources(type: Copy) {
 }
 
 compileJava {
+    dependsOn(processSources)
     source = processSources.destinationDir
 }
 
-compileJava.dependsOn(processSources)
+mainClassName = "de.ellpeck.rockbottom.Main"
 
-task createIntelliJRuns{
-	group = 'ide'
-	description = 'Creates the project run configuration for IntelliJ IDEA'
-    def file = new File("$projectDir", ".idea" + File.separator + "runConfigurations" + File.separator + "Launch RB Default.xml")
-    if(!file.exists()){
+run {
+    dependsOn(compileJava)
+    args = ["--unpackedModsDir", "./build/classes/main", "--tempDir", "./build/temp"]
+}
+
+// You should not use these tasks! Distribution of the game jar is not allowed!
+assembleDist.setEnabled(false)
+distTar.setEnabled(false)
+distZip.setEnabled(false)
+installDist.setEnabled(false)
+
+task createIntelliJRuns {
+    group = 'ide'
+    description = 'Creates the project run configuration for IntelliJ IDEA'
+    def file = new File("$projectDir", ".idea" + File.separator + "runConfigurations" + File.separator + "Launch RB.xml")
+    if (!file.exists()) {
         file.getParentFile().mkdirs()
         file.createNewFile()
     }
     file.setText("<component name=\"ProjectRunConfigurationManager\">\n" +
-            "  <configuration default=\"false\" name=\"Launch RB Default\" type=\"Application\" factoryName=\"Application\" singelton=\"true\">\n" +
-            "    <extension name=\"coverage\" enabled=\"false\" merge=\"false\" sample_coverage=\"true\" runner=\"idea\" />\n" +
-            "    <option name=\"MAIN_CLASS_NAME\" value=\"de.ellpeck.rockbottom.Launcher\" />\n" +
-            "    <option name=\"VM_PARAMETERS\" value=\"\" />\n" +
-            "    <option name=\"PROGRAM_PARAMETERS\" value=\"--unpackedModsDir ./build/classes/main\" />\n" +
-            "    <option name=\"WORKING_DIRECTORY\" value=\"file://\$PROJECT_DIR\$\" />\n" +
-            "    <option name=\"ALTERNATIVE_JRE_PATH_ENABLED\" value=\"false\" />\n" +
-            "    <option name=\"ALTERNATIVE_JRE_PATH\" />\n" +
-            "    <option name=\"ENABLE_SWING_INSPECTOR\" value=\"false\" />\n" +
-            "    <option name=\"ENV_VARIABLES\" />\n" +
-            "    <option name=\"PASS_PARENT_ENVS\" value=\"true\" />\n" +
-            "    <module name=\"$project.name\" />\n" +
-            "    <envs />\n" +
-            "    <method />\n" +
-            "  </configuration>\n" +
-            "</component>", "UTF-8")
-	file = new File("$projectDir", ".idea" + File.separator + "runConfigurations" + File.separator + "Launch RB Debug.xml")
-    if(!file.exists()){
-        file.getParentFile().mkdirs()
-        file.createNewFile()
-    }
-    file.setText("<component name=\"ProjectRunConfigurationManager\">\n" +
-            "  <configuration default=\"false\" name=\"Launch RB Debug\" type=\"Application\" factoryName=\"Application\" singelton=\"true\">\n" +
-            "    <extension name=\"coverage\" enabled=\"false\" merge=\"false\" sample_coverage=\"true\" runner=\"idea\" />\n" +
-            "    <option name=\"MAIN_CLASS_NAME\" value=\"de.ellpeck.rockbottom.Main\" />\n" +
-            "    <option name=\"VM_PARAMETERS\" value=\"\" />\n" +
-            "    <option name=\"PROGRAM_PARAMETERS\" value=\"--unpackedModsDir ./build/classes/main --tempDir ./build/temp\" />\n" +
-            "    <option name=\"WORKING_DIRECTORY\" value=\"file://\$PROJECT_DIR\$\" />\n" +
-            "    <option name=\"ALTERNATIVE_JRE_PATH_ENABLED\" value=\"false\" />\n" +
-            "    <option name=\"ALTERNATIVE_JRE_PATH\" />\n" +
-            "    <option name=\"ENABLE_SWING_INSPECTOR\" value=\"false\" />\n" +
-            "    <option name=\"ENV_VARIABLES\" />\n" +
-            "    <option name=\"PASS_PARENT_ENVS\" value=\"true\" />\n" +
-            "    <module name=\"$project.name\" />\n" +
-            "    <envs />\n" +
-            "    <method />\n" +
-            "  </configuration>\n" +
+            "    <configuration default=\"false\" name=\"Launch RB\" type=\"GradleRunConfiguration\" factoryName=\"Gradle\">\n" +
+            "        <ExternalSystemSettings>\n" +
+            "            <option name=\"executionName\" />\n" +
+            "            <option name=\"externalProjectPath\" value=\"\$PROJECT_DIR\$\" />\n" +
+            "            <option name=\"externalSystemIdString\" value=\"GRADLE\" />\n" +
+            "            <option name=\"scriptParameters\" />\n" +
+            "            <option name=\"taskDescriptions\">\n" +
+            "               <list />\n" +
+            "            </option\n>" +
+            "            <option name=\"taskNames\">\n" +
+            "               <list>\n" +
+            "            <option value=\"run\" />" +
+            "               </list>\n" +
+            "            </option>\n" +
+            "            <option name=\"vmOptions\" />\n" +
+            "        </ExternalSystemSettings>\n" +
+            "        <method />\n" +
+            "    </configuration>\n" +
             "</component>", "UTF-8")
 }
 
-task createEclipseRuns{
-	group = 'ide'
-	description = 'Creates the project run configuration for Eclipse'
+task createEclipseRuns {
+    group = 'ide'
+    description = 'Creates the project run configuration for Eclipse'
     def file = new File("$projectDir", "Launch Default.launch")
-    if(!file.exists()){
+    if (!file.exists()) {
         file.getParentFile().mkdirs()
         file.createNewFile()
     }
@@ -107,8 +100,8 @@ task createEclipseRuns{
             "<stringAttribute key=\"org.eclipse.jdt.launching.PROGRAM_ARGUMENTS\" value=\"--unpackedModsDir ./build/classes/main\"/>\n" +
             "<stringAttribute key=\"org.eclipse.jdt.launching.PROJECT_ATTR\" value=\"$project.name\"/>\n" +
             "</launchConfiguration>", "UTF-8")
-	file = new File("$projectDir", "Launch Debug.launch")
-    if(!file.exists()){
+    file = new File("$projectDir", "Launch Debug.launch")
+    if (!file.exists()) {
         file.getParentFile().mkdirs()
         file.createNewFile()
     }
